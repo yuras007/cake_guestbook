@@ -1,5 +1,9 @@
 <h1 align="center">Гостьова книга</h1>
 
+<p align="right">
+    <a href="/users/logout">exit</a>
+</p>
+
 <br />
 <?php echo $this->Html->link('Додати повідомлення', array('controller' => 'Posts',
                              'action' => 'add')); ?>
@@ -63,8 +67,8 @@ echo $this->Paginator->next('   Наступна »', null, null, array('class' 
 
 // Друкуємо к-сть сторінок і записів
 echo '<br />'.$this->Paginator->counter(array(
-    'format' => 'Сторінка {:page} з {:pages}, показується по {:current} записи з
-             {:count} загальних'
+    'format' => 'Сторінка {:page} з {:pages}'.'<br />'.'(показується по {:current} записи з
+             {:count} загальних)'
 ));
 ?>
 </p>

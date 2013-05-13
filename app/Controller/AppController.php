@@ -32,4 +32,33 @@ App::uses('Controller', 'Controller');
  * @link		http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+    
+    public $components = array(
+            'Session',
+            'Auth' => array(
+                'loginRedirect' => array('controller' => 'posts', 'action' => 'index'),
+                'logoutRedirect' => array('controller' => 'users', 'action' => 'login'),
+                'authorize' => array('Controller')
+                )
+            );
+
+    public function beforeFilter() {
+        $this->Auth->allow('index', 'view');
+    }
+    
+    /**
+     * method isAuthorized
+     * 
+     * @param string $user
+     * @return boolean
+     */
+    public function isAuthorized($user) {
+        // Адмін має доступ до всіх екшенів
+        if (isset($user['role']) && $user['role'] === 'admin') {
+            return true;
+        }
+        // значення по замовчуванню
+        return false;
+    }
+    
 }

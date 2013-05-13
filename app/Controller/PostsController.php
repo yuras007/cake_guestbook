@@ -8,29 +8,31 @@
  */
 
 class PostsController extends AppController {
+    
     public $helpers = array( 'Html', 'Form', 'Session', 'Paginator' );
+    
     public $components = array( 'Session' );
     
      public $paginate = array(
         'limit' => 2,
         'order' => array(
             'Post.created' => 'desc'
-        )
-    );
+        ));
+     
     /** 
      * Метод для перегляду списку повідомлень (по замовчуванню)
      *  
-     *  @return void()
+     *  @return void
      */
     public function index() {
         $this->set('posts', $this->paginate('Post'));
     }
     
     /**
-     * Метод для перегляду повідомлення із номером id
+     * view method
      * 
      * @param int $id - id повідомлення
-     * @return void() 
+     * @return void 
      */
     public function view($id = NULL) {
         if (!$id)
@@ -42,13 +44,13 @@ class PostsController extends AppController {
     }
 
     /**
-     * Метод для додавання повідомлення
+     * add method
      * 
-     * @return void()
+     * @return void
      */
     public function add() {
          if ( $this->request->is('post') ) {
-            //$this->request->data['Guestbook']['user_id'] = $this->Auth->user('id');
+            $this->request->data['Post']['user_id'] = $this->Auth->user('id');
             $this->Post->create();
             if ( $this->Post->save($this->request->data) ) {
                 $this->Session->setFlash('Повідомлення збережено.');
@@ -60,10 +62,10 @@ class PostsController extends AppController {
     }
     
     /**
-     * Метод для редагування повідомлення
+     * edit method
      * 
      * @param int $id - id повідомлення
-     * @return void() 
+     * @return void
      */
     public function edit($id = NULL) {
         if (!$id) {
@@ -88,10 +90,10 @@ class PostsController extends AppController {
     }
     
     /**
-     * Метод для видалення повідомлення
+     * delete method
      * 
      * @param int $id - id повідомлення
-     * @return void() 
+     * @return void
      */
     public function delete($id) {
         if ($this->request->is('get')) {
@@ -102,6 +104,28 @@ class PostsController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
     }
+    
+    /**
+     * isAuthorized method
+     * 
+     * @param string $user
+     * @return boolean
+     */
+    public function isAuthorized($user) {
+        // Всі зареєстовані користувачі можуть додавати повідомлення
+        if ($this->action === 'add') {
+            return true;
+        }
+        // Власники повідомлень можуть видаляти і редагувати їх
+        if (in_array($this->action, array('edit', 'delete'))) {
+            $postId = $this->request->params['pass'][0];
+            if ($this->Post->isOwnedBy($postId, $user['id'])) {
+                return true;
+            }
+        }
+        return parent::isAuthorized($user);
+    }
+    
 }
 
 ?>
